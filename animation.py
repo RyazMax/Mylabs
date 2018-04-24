@@ -11,8 +11,8 @@ class Ball(pg.sprite.Sprite):
         super(Ball, self).__init__()
         self.x = x
         self.y = y
-        self.speedX = 300
-        self.speedY = 300
+        self.speedX = 500
+        self.speedY = 500
         self.radius = radius
         self.color = (200, 150, 100)
 
@@ -44,7 +44,10 @@ class Ball(pg.sprite.Sprite):
             self.speedY = -self.speedY
 
         if self.y-self.radius<wall.rect.bottom:
-            self.speedY = -self.speedY
+            if abs(self.speedY-wall.speed)<1e-6:
+                self.speedY = -self.speedY
+            else:
+                self.speedY = -self.speedY+wall.speed
             print("COLIDE")
             self.y = int(wall.rect.bottom+self.radius)
 
@@ -57,7 +60,7 @@ class Wall(pg.sprite.Sprite):
         self.surf = pg.Surface((SIZE[0], 200))
         self.surf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.speed = 300
+        self.speed = 150 
 
     def update(self, time):
         self.rect.move_ip(0, self.speed*time)
