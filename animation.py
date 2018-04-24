@@ -7,12 +7,12 @@ BACKGROUND = (220, 220, 220)
 SIZE = (800, 600)
 
 class Ball(pg.sprite.Sprite):
-    def __init__(self, x=0, y=0, radius=50):
+    def __init__(self,coor=(0,0) , radius=50):
         super(Ball, self).__init__()
-        self.x = x
-        self.y = y
-        self.speedX = 500
-        self.speedY = 500
+        self.x = coor[0]
+        self.y = coor[1]
+        self.speedX = 300
+        self.speedY = 300
         self.radius = radius
         self.color = (200, 150, 100)
 
@@ -47,8 +47,8 @@ class Ball(pg.sprite.Sprite):
             if abs(self.speedY-wall.speed)<1e-6:
                 self.speedY = -self.speedY
             else:
-                self.speedY = -self.speedY+wall.speed
-            print("COLIDE")
+                self.speedY = -self.speedY+wall.speed/2
+           # print(self.speedY)
             self.y = int(wall.rect.bottom+self.radius)
 
     def draw(self):
@@ -60,7 +60,7 @@ class Wall(pg.sprite.Sprite):
         self.surf = pg.Surface((SIZE[0], 200))
         self.surf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.speed = 150 
+        self.speed = 100 
 
     def update(self, time):
         self.rect.move_ip(0, self.speed*time)
@@ -76,13 +76,15 @@ class Wall(pg.sprite.Sprite):
 pg.init()
 pg.display.set_caption('Animation by Ryazanov Maxim')
 screen = pg.display.set_mode(SIZE)
-ball = Ball(400, 500)
+ball = Ball((400, 500))
 wall = Wall()
 running = True
 clock = pg.time.Clock()
 objects = pg.sprite.Group()
 objects.add(wall)
-
+surf = pg.Surface((100, 100 ))
+pg.draw.circle(surf, (0, 0, 0), (25,25),10)
+balls = pg.sprite.Group(ball)
 while running:
     for event in pg.event.get():
         if event.type == QUIT:
@@ -90,19 +92,26 @@ while running:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 running = False
+        if event.type == MOUSEBUTTONDOWN:
+            balls.add(Ball(event.dict['pos']))
+
     secs = clock.tick(TICKS)/1000
     #if pg.sprite.spritecollideany(ball, pg.sprite.Group(wall)):
        # ball.speedY = -ball.speedY
         
     pressed_keys = pg.key.get_pressed()
-    ball.update(pressed_keys, time=secs)
+    for i in balls:
+        i.update(pressed_keys, time=secs)
     wall.update(time=secs)
-    ball.colide()
+    for i in balls:
+        i.colide()
 
     screen.fill(BACKGROUND)
     for obj in objects:
         screen.blit(obj.surf, obj.rect)
-    ball.draw()
-    pg.display.flip()
+    screen.blit(surf, (100, 600))
+    for i in balls:
+        i.draw()
+    pg.display.update()
 
 pg.quit()
