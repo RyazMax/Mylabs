@@ -2,7 +2,7 @@ import pygame as pg
 from pygame.locals import *
 import random, math
 
-TICKS = 30
+TICKS = 60 
 BACKGROUND = (220, 220, 220)
 SIZE = (800, 600)
 
@@ -29,6 +29,7 @@ class Ball(pg.sprite.Sprite):
         self.x += int(self.speedX*time)
         self.y += int(self.speedY*time)
 
+    def colide(self):
         if self.x-self.radius < 0:
             self.x = self.radius
             self.speedX = -self.speedX
@@ -42,9 +43,10 @@ class Ball(pg.sprite.Sprite):
             self.y = 600-self.radius
             self.speedY = -self.speedY
 
-        if self.y-self.radius<wall.rect.bottom+wall.speed*time:
+        if self.y-self.radius<wall.rect.bottom:
             self.speedY = -self.speedY
-            self.y = int(wall.rect.bottom+self.radius-wall.speed*time)
+            print("COLIDE")
+            self.y = int(wall.rect.bottom+self.radius)
 
     def draw(self):
         pg.draw.circle(screen, self.color, (self.x, self.y), self.radius)
@@ -58,7 +60,7 @@ class Wall(pg.sprite.Sprite):
         self.speed = 300
 
     def update(self, time):
-        self.rect.move_ip(0, -self.speed*time)
+        self.rect.move_ip(0, self.speed*time)
 
         if self.rect.top < 0:
             self.rect.top = 0
@@ -92,6 +94,7 @@ while running:
     pressed_keys = pg.key.get_pressed()
     ball.update(pressed_keys, time=secs)
     wall.update(time=secs)
+    ball.colide()
 
     screen.fill(BACKGROUND)
     for obj in objects:
