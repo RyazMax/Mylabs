@@ -22,6 +22,14 @@ SIZE = (800, 600)
 LINE_W = 2
 DIST_K = 1.4
 
+
+def sign(num):
+    if num == 0: 
+        return 0
+    else:
+        return abs(num)/num
+
+
 def ball_update(ball, time):
     # Обновление координат шара
     # ball - словарь свойств шара
@@ -42,15 +50,19 @@ def ball_colide(ball, wall):
     if ball['x']-ball['rad'] < 0:
         ball['x'] = ball['rad']
         ball['speedX'] = -ball['speedX']
+        ball['angleSpeed'] = sign(ball['speedY'])*abs(ball['angleSpeed'])
     elif ball['x'] + ball['rad'] > SIZE[0]:
         ball['x'] = SIZE[0]-ball['rad']
         ball['speedX'] = -ball['speedX']
+        ball['angleSpeed'] = -sign(ball['speedY'])*abs(ball['angleSpeed'])
     if ball['y'] - ball['rad'] < 0:
         ball['y'] = ball['rad']
         ball['speedY'] = -ball['speedY']
+        ball['angleSpeed'] = -sign(ball['speedX'])*abs(ball['angleSpeed'])
     elif ball['y'] + ball['rad'] > SIZE[1]:
         ball['y'] = SIZE[1]-ball['rad']
         ball['speedY'] = -ball['speedY']
+        ball['angleSpeed'] = sign(ball['speedX'])*abs(ball['angleSpeed'])
 
     # Cтолкновение со стеной
     if ball['y'] - ball['rad'] < wall['y']+wall['height']/2:
@@ -58,6 +70,8 @@ def ball_colide(ball, wall):
             ball['speedY'] = -ball['speedY']
         else:
             ball['speedY'] = -ball['speedY'] #+wall['speedY']
+            ball['angleSpeed'] = -sign(ball['speedX'])*abs(ball['angleSpeed'])
+
         ball['y'] = int(wall['y']+wall['height']/2 + ball['rad'])
 
 
